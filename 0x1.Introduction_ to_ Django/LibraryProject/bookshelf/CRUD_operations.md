@@ -5,7 +5,7 @@
     author=“George Orwell”,
     publication_year=1949,
 )
->>> print(books)
+>>> Book.objects.get(title="1984")
 {'id': 1, 'title': '1984', 'author': 'George Orwell', 'publication_year': 1949}
 >>> update_book = Book.objects.get(id=1)
 >>> update_book.title = "Nineteen Eighty-Four"
