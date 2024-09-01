@@ -1,4 +1,4 @@
-#!/home/john_doe/Documents/dev_space/Alx_DjangoLearnLab/venv/bin/python3
+#!/home/user/Documents/workspace/Alx_DjangoLearnLab/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
