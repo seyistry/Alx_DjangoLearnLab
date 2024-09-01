@@ -1,2 +1,7 @@
-# ignore python cache files
+# Ignore all __pycache__ directories
 __pycache__/
+
+# Ignore all virtual environment directories (e.g., venv, .venv, env)
+venv/
+.venv/
+env/
