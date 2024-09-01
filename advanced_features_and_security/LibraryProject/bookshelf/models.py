@@ -17,6 +17,14 @@ class CustomUser(AbstractUser):
 
 
 class CustomUserManager(BaseUserManager):
+    class Meta:
+        permissions = [
+            ('can_view', 'Can view'),
+            ('can_create', 'Can create'),
+            ('can_edit', 'Can edit'),
+            ('can_delete', 'Can delete'),
+        ]
+
     def create_user(self, email, date_of_birth, profile_photo,  password=None):
         if not email:
             raise ValueError('The Email field must be set')
