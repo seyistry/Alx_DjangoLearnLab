@@ -1,0 +1,18 @@
+<!-- login.html -->
+<<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Book_list</title>
+    <link rel="stylesheet" href="" />
+  </head>
+  <body>
+    <h1>Book_list</h1>
+    <ul>
+      {% for book in books %}
+      <li>{{ book.title }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
