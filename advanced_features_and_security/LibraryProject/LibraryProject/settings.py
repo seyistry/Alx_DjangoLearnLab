@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Point Django to the custom user model
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
+
 
 # Application definition
 
@@ -37,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'bookshelf.apps.BookshelfConfig',
+    'bookshelf.apps.BookshelfConfig',
 ]
 
 MIDDLEWARE = [
