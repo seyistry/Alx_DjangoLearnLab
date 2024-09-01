@@ -11,9 +11,9 @@ class Book(models.Model):
 
 
 class CustomUser(AbstractUser):
-    date_of_birth = models.DateField(blank=False, null=False)
+    date_of_birth = models.DateField(blank=True, null=True)
     profile_photo = models.ImageField(
-        upload_to='profile_photos/', blank=False, null=False)
+        upload_to='profile_photos/', blank=True, null=True)
 
 
 class CustomUserManager(BaseUserManager):
