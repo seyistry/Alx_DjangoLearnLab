@@ -15,7 +15,7 @@ from rest_framework import status
 
 
 # this is a list view that returns all the books in the database
-class ListBookView(ListAPIView):
+class ListView(ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
@@ -25,7 +25,7 @@ class ListBookView(ListAPIView):
 # this is a detail view that returns a single book based on the id
 
 
-class DetailBookView(RetrieveAPIView):
+class DetailView(RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     lookup_field = 'pk'
@@ -34,7 +34,7 @@ class DetailBookView(RetrieveAPIView):
 # this is a create view that allows a new book to be created
 
 
-class CreateBookView(CreateAPIView):
+class CreateView(CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
@@ -48,7 +48,7 @@ class CreateBookView(CreateAPIView):
 
 
 # this is an update view that allows a book to be updated
-class UpdateBookView(UpdateAPIView):
+class UpdateView(UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
@@ -65,7 +65,7 @@ class UpdateBookView(UpdateAPIView):
 
 
 # this is a delete view that allows a book to be deleted
-class DeleteBookView(DestroyAPIView):
+class DeleteView(DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
