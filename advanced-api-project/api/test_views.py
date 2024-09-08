@@ -12,6 +12,8 @@ from rest_framework import status
 user = User.objects.get(username='admin')
 user.save()
 
+# "self.client.login"
+
 # Create an instance of APIClient
 client = APIClient()
 
