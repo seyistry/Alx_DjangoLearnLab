@@ -12,7 +12,7 @@ from .serializers import BookSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 # from django_filters import rest_framework
 from rest_framework.filters import SearchFilter
-from rest_framework import status, generics
+from rest_framework import generics, status
 
 
 # this is a list view that returns all the books in the database
