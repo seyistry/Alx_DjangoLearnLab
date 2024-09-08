@@ -3,6 +3,7 @@ from .models import Book, Author
 from rest_framework.test import APIRequestFactory, APITestCase, URLPatternsTestCase, APIClient
 from django.urls import include, path, reverse
 from django.contrib.auth.models import User
+from rest_framework import status
 
 # Test the filtering, searching, and ordering functionalities to verify they work as intended.
 # add user authentication to the tests
