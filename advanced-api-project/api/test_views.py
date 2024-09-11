@@ -57,55 +57,57 @@ class BookFilterSearchOrderTest(TestCase):
         self.assertEqual(queryset[3].title, 'To Kill the Mockingbird')
 
 class BookListViewTest(APITestCase, URLPatternsTestCase):
-	urlpatterns = [
-		path('api/', include('api.urls'))
-	]
-	def setUp(self):
-		self.author1 = Author.objects.create(name='J.D. Salinger')
-		self.author2 = Author.objects.create(name='Harper Lee')
-		self.author3 = Author.objects.create(name='George Orwell')
-		self.book1 = Book.objects.create(
-			title='The Catcher in the Rye', author=self.author1, publication_year='1951')
-		self.book2 = Book.objects.create(
-			title='To Kill the Mockingbird', author=self.author2, publication_year='1960')
-		self.book3 = Book.objects.create(
-			title='1984', author=self.author3, publication_year='1949')
-		self.book4 = Book.objects.create(
-			title='Animal Farm', author=self.author3, publication_year='1945')
+    urlpatterns = [
+        path('api/', include('api.urls'))
+    ]
+    def setUp(self):
+        self.author1 = Author.objects.create(name='J.D. Salinger')
+        self.author2 = Author.objects.create(name='Harper Lee')
+        self.author3 = Author.objects.create(name='George Orwell')
+        self.book1 = Book.objects.create(
+            title='The Catcher in the Rye', author=self.author1, publication_year='1951')
+        self.book2 = Book.objects.create(
+            title='To Kill the Mockingbird', author=self.author2, publication_year='1960')
+        self.book3 = Book.objects.create(
+            title='1984', author=self.author3, publication_year='1949')
+        self.book4 = Book.objects.create(
+            title='Animal Farm', author=self.author3, publication_year='1945')
 
-	def test_list_view(self):
-		url = reverse('book-list')  # Ensure 'book-list' is the name of the URL pattern
-		response = self.client.get('books/')
-		self.assertEqual(response.status_code, 200)
-		self.assertEqual(len(response.data), 4)
+    def test_list_view(self):
+        self.client = APIClient()
+        self.client.login(username='admin', password='admin')
+        url = reverse('book-list')  # Ensure 'book-list' is the name of the URL pattern
+        response = self.client.get('books/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 4)
 
-	def test_detail_view(self):
-		response = self.client.get(f'books/{self.book1.id}/')
-		self.assertEqual(response.status_code, 200)
-		self.assertEqual(response.data['title'], 'The Catcher in the Rye')
+    def test_detail_view(self):
+        response = self.client.get(f'books/{self.book1.id}/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['title'], 'The Catcher in the Rye')
 
-	def test_create_view(self):
-		data = {
-			'title': 'The Great Gatsby',
-			'author': self.author1.id,
-			'publication_year': '1925'
-		}
-		response = self.client.post('books/create/', data)
-		self.assertEqual(response.status_code, 201)
-		self.assertEqual(Book.objects.count(), 5)
+    def test_create_view(self):
+        data = {
+            'title': 'The Great Gatsby',
+            'author': self.author1.id,
+            'publication_year': '1925'
+        }
+        response = self.client.post('books/create/', data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Book.objects.count(), 5)
 
-	def test_update_view(self):
-		data = {
-			'title': 'The Great Gatsby',
-			'author': self.author1.id,
-			'publication_year': '1925'
-		}
-		response = self.client.put(f'books/update/{self.book1.id}/', data)
-		self.assertEqual(response.status_code, 200)
-		self.assertEqual(Book.objects.get(id=self.book1.id).title, 'The Great Gatsby')
+    def test_update_view(self):
+        data = {
+            'title': 'The Great Gatsby',
+            'author': self.author1.id,
+            'publication_year': '1925'
+        }
+        response = self.client.put(f'books/update/{self.book1.id}/', data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Book.objects.get(id=self.book1.id).title, 'The Great Gatsby')
 
-	def test_delete_view(self):
-		response = self.client.delete(f'books/delete/{self.book1.id}/')
-		self.assertEqual(response.status_code, 204)
-		self.assertEqual(Book.objects.count(), 3)
+    def test_delete_view(self):
+        response = self.client.delete(f'books/delete/{self.book1.id}/')
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Book.objects.count(), 3)
 
