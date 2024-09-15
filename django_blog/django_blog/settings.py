@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Application definition
 
@@ -125,6 +127,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "blog" / "static",
 ]
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'profile'  # Redirect to profile after login
+LOGOUT_REDIRECT_URL = 'login'   # Redirect to login after logout
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
