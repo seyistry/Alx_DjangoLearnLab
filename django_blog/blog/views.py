@@ -5,7 +5,65 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserForm, UserProfileForm
+from .models import Post
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse
 
+
+class postsListView(ListView):
+    model = Post
+    template_name = 'blog/all.html'
+    context_object_name = 'posts'
+
+
+class postDetailView(DetailView):
+    model = Post
+    template_name = 'blog/post_detail.html'
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    template_name = 'blog/post_form.html'
+    fields = ['title', 'content']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.object.pk})
+
+
+class postUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Post
+    template_name = 'blog/post_form.html'
+    fields = ['title', 'content']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.object.pk})
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+
+
+class postDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    template_name = 'blog/post_confirm_delete.html'
+    success_url = '/blog/posts'
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -22,13 +80,16 @@ class CustomUserCreationForm(UserCreationForm):
             user.save()
         return user
 
+
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Account created successfully! You can now log in.')
-            return redirect('login')  # Redirect the user after successful registration
+            messages.success(
+                request, 'Account created successfully! You can now log in.')
+            # Redirect the user after successful registration
+            return redirect('login')
     else:
         form = CustomUserCreationForm()  # Handle GET request by creating an empty form
 
@@ -39,12 +100,14 @@ def register(request):
 def profile(request):
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
-        profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.userprofile)
+        profile_form = UserProfileForm(
+            request.POST, request.FILES, instance=request.user.userprofile)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.success(request, 'Your profile has been updated successfully!')
+            messages.success(
+                request, 'Your profile has been updated successfully!')
             return redirect('profile')
     else:
         user_form = UserForm(instance=request.user)
@@ -56,6 +119,3 @@ def profile(request):
     }
 
     return render(request, 'blog/profile.html', context)
-
-
-
