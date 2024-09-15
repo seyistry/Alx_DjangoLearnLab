@@ -11,7 +11,7 @@ urlpatterns = [
     path('posts/', views.postsListView.as_view(), name='posts'),
     path('posts/new/', views.PostCreateView.as_view(), name='post_new'),
     path('posts/<int:pk>', views.postDetailView.as_view(), name='post_detail'),
-    path('posts/<int:pk>/edit/', views.postUpdateView.as_view(), name='post_edit'),
+    path('posts/<int:pk>/update/', views.postUpdateView.as_view(), name='post_edit'),
     path('posts/<int:pk>/delete/', views.postDeleteView.as_view(), name='post_delete'),
 
     # Custom views for registration and profile
