@@ -27,12 +27,12 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        form.instance.post = Post.objects.get(pk=self.kwargs['post_id'])
+        form.instance.post = Post.objects.get(pk=self.kwargs['pk'])
         return super().form_valid(form)
 
     def get_success_url(self):
         print(self.kwargs)
-        return reverse('post_detail', kwargs={'pk': self.kwargs['post_id']})
+        return reverse('post_detail', kwargs={'pk': self.kwargs['pk']})
 
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -41,6 +41,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     fields = ['content']
 
     def form_valid(self, form):
+        print(self.kwargs)
         form.instance.author = self.request.user
         form.instance.post = Post.objects.get(pk=self.kwargs['pk'])
         return super().form_valid(form)
@@ -60,7 +61,10 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     template_name = 'blog/comment_confirm_delete.html'
 
     def get_success_url(self):
-        return reverse('comments', kwargs={'pk': self.kwargs['pk'], 'pk2': self.kwargs['pk2']})
+        # reverse to post_detail page
+        # get post id from the comment
+        post_id = self.get_object().post.id
+        return reverse('post_detail', kwargs={'pk': post_id}) 
 
     def test_func(self):
         comment = self.get_object()
