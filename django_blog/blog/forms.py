@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import UserProfile, Post, Comment
-from taggit.forms import TagField
+from taggit.forms import TagWidget
 
 
 class UserForm(forms.ModelForm):
@@ -16,47 +16,28 @@ class UserProfileForm(forms.ModelForm):
         fields = ['bio', 'profile_picture']
 
 
-class PostForm(forms.ModelForm):
-    # Update the PostForm to include a field for adding or editing tags
-    post_tags = TagField(
-        required=False, help_text='Enter tags separated by commas')
-
+class PostForm(forms.ModelForm): 
     class Meta:
         model = Post
-        # 'author' is handled in the form logic, so it's not included here
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'post_tags']  # Include 'tags' in the fields
+        widgets = {
+            'tags': TagWidget(),  # Use TagWidget for the tags field
+        }
 
     def __init__(self, *args, **kwargs):
-        # Extract the user from kwargs and remove it before passing to the parent class
+        # Extract the logged-in user from kwargs
         self.user = kwargs.pop('user', None)
-        super(PostForm, self).__init__(*args, **kwargs)
-
-        # Set the initial value for the 'author' field to the logged-in user
-        if self.user:
-            self.instance.author = self.user
-
-        # If the post instance has existing tags, initialize the 'post_tags' field with them
-        if self.instance and self.instance.pk:
-            self.fields['post_tags'].initial = ', '.join(
-                tag.name for tag in self.instance.tags.all())
+        super().__init__(*args, **kwargs)
 
     def save(self, commit=True):
-        # Override the save method to save the tags
-        post = super(PostForm, self).save(commit=False)
+        post = super().save(commit=False)
 
-        # Save the user as the author if the post is new
+        # Set the author if it's a new post and the user is provided
         if self.user and not post.pk:
             post.author = self.user
 
-        # Save the post object first
         if commit:
             post.save()
-
-        # Save the tags after the post has been saved
-        post.tags.set(*[tag.strip()
-                      for tag in self.cleaned_data['post_tags'].split(',')])
-
-        return post
 
 
 class CommentForm(forms.ModelForm):  # create and update forms for comments
