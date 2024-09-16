@@ -1,7 +1,7 @@
 {% extends 'blog/base.html' %} {% block content %}
 <h2>Create New Post</h2>
 <form method="post">
-  {% csrf_token %} {{ form.as_p }}
+  {% csrf_token %} {{ form.media }} {{ form.as_p }}
   <button type="submit">Create Post</button>
 </form>
 {% endblock %}

@@ -9,6 +9,7 @@ from .models import Post, Comment
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
+from django.db.models import Q
 
 
 class commentListView(ListView):
@@ -66,7 +67,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         # reverse to post_detail page
         # get post id from the comment
         post_id = self.get_object().post.id
-        return reverse('post_detail', kwargs={'pk': post_id}) 
+        return reverse('post_detail', kwargs={'pk': post_id})
 
     def test_func(self):
         comment = self.get_object()
@@ -143,11 +144,14 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
-    
+
+
 def search(request):
     query = request.GET.get('q')
     if query:
-        posts = Post.objects.filter(title__icontains=query)
+        posts = Post.objects.filter(
+            Q(title__icontains=query) | Q(post_tags__name__icontains=query)
+        ).distinct()
     else:
         posts = Post.objects.all()
     return render(request, 'blog/search.html', {'posts': posts})

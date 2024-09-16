@@ -21,7 +21,7 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['title', 'content', 'post_tags']  # Include 'tags' in the fields
         widgets = {
-            'tags': TagWidget(),  # Use TagWidget for the tags field
+            'post_tags': TagWidget(),  # Use TagWidget for the tags field
         }
 
     def __init__(self, *args, **kwargs):
