@@ -20,6 +20,14 @@ class commentListView(ListView):
     def get_queryset(self):
         return Comment.objects.filter(post=self.kwargs['pk'])
 
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/post_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        return Post.objects.filter(post_tags__name__in=[self.kwargs['tag_slug']])
+
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment

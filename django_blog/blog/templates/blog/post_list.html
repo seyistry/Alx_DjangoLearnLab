@@ -1,0 +1,19 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+	<h2>Search</h2>
+	<form method="GET">
+		<input type="text" name="q" placeholder="Search for posts">
+		<button type="submit">Search</button>
+	</form>
+	{% if posts %}
+		<h3>Results</h3>
+		<ul>
+			{% for post in posts %}
+				<li>
+					<a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}
