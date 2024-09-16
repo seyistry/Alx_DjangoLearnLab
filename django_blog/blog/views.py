@@ -5,10 +5,68 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserForm, UserProfileForm
-from .models import Post
+from .models import Post, Comment
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
+
+
+class commentListView(ListView):
+    model = Comment
+    template_name = 'blog/comments.html'
+    context_object_name = 'comments'
+
+    def get_queryset(self):
+        return Comment.objects.filter(post=self.kwargs['pk'])
+
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    template_name = 'blog/comment_form.html'
+    fields = ['content']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post = Post.objects.get(pk=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        print(self.kwargs)
+        return reverse('post_detail', kwargs={'pk': self.kwargs['pk']})
+
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    template_name = 'blog/comment_form.html'
+    fields = ['content']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post = Post.objects.get(pk=self.kwargs['pk'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.kwargs['pk']})
+
+    def test_func(self):
+        comment = self.get_object()
+        if self.request.user == comment.author:
+            return True
+        return False
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+
+    def get_success_url(self):
+        return reverse('comments', kwargs={'pk': self.kwargs['pk'], 'pk2': self.kwargs['pk2']})
+
+    def test_func(self):
+        comment = self.get_object()
+        if self.request.user == comment.author:
+            return True
+        return False
 
 
 class postsListView(ListView):

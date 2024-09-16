@@ -7,4 +7,18 @@
 	<a href="{% url 'post_edit' post.id %}">Edit</a>
 	<span> | </span>
 	<a href="{% url 'post_delete' post.id %}">Delete</a>
+	<span> | </span>
+	<a href="{% url 'comment_new' post.id %}">Add Comment</a>
+	<h3>Comments</h3>
+	{% for comment in post.comments.all %}
+	<div style="padding-left: 20px; margin-top: 20px;">
+	 	<h4 style="margin: 5px">{{ comment.content }}</h4>
+		<span>Published on {{ comment.created_at }}</span>
+		<span>Author: {{ comment.author }}</span>
+		<a href="{% url 'comment_edit' post.id comment.id %}">Edit</a>
+		<span> | </span>
+		<a href="{% url 'comment_delete' post.id comment.id %}">Delete</a>  
+	</div>
+		
+	{% endfor %}
 {% endblock %}
