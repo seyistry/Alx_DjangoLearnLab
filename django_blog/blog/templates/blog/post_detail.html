@@ -15,9 +15,11 @@
 	 	<h4 style="margin: 5px">{{ comment.content }}</h4>
 		<span>Published on {{ comment.created_at }}</span>
 		<span>Author: {{ comment.author }}</span>
-		<a href="{% url 'comment_edit' comment.id %}">Edit</a>
-		<span> | </span>
-		<a href="{% url 'comment_delete' comment.id %}">Delete</a>  
+		{% if comment.author == request.user %}
+			<a href="{% url 'comment_edit' comment.id %}">Edit</a>
+			<span> | </span>
+			<a href="{% url 'comment_delete' comment.id %}">Delete</a>  
+		{% endif %}
 	</div>
 		
 	{% endfor %}

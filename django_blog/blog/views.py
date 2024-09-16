@@ -26,6 +26,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     fields = ['content']
 
     def form_valid(self, form):
+        print(self.kwargs)
         form.instance.author = self.request.user
         form.instance.post = Post.objects.get(pk=self.kwargs['pk'])
         return super().form_valid(form)
@@ -43,11 +44,12 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def form_valid(self, form):
         print(self.kwargs)
         form.instance.author = self.request.user
-        form.instance.post = Post.objects.get(pk=self.kwargs['pk'])
+
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('post_detail', kwargs={'pk': self.kwargs['pk']})
+        post_id = self.get_object().post.id
+        return reverse('post_detail', kwargs={'pk': post_id})
 
     def test_func(self):
         comment = self.get_object()
@@ -141,6 +143,14 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+def search(request):
+    query = request.GET.get('q')
+    if query:
+        posts = Post.objects.filter(title__icontains=query)
+    else:
+        posts = Post.objects.all()
+    return render(request, 'blog/search.html', {'posts': posts})
 
 
 def register(request):
