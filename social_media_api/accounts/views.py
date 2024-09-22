@@ -6,9 +6,6 @@ from .serializers import UserRegistrationSerializer, UserLoginSerializer
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
-import logging
-
-logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -55,7 +52,6 @@ class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        logger.info(f"User: {request.user}, Auth: {request.auth}")
         user = request.user
         return Response({
             'username': user.username,
