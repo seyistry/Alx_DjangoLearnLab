@@ -103,10 +103,10 @@ class FeedView(APIView):
 class LikePostView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # posts/views.py doesn't contain: ["generics.get_object_or_404(Post, pk=pk)", "Like.objects.get_or_create(user=request.user, post=post)"]
+    # "Like.objects.get_or_create(user=request.user, post=post)"]
 
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+    def post(self, request, pk):
+        post = generics.get_object_or_404(Post, id=pk)
         user = request.user
 
         # Check if the user has already liked this post
@@ -131,8 +131,8 @@ class LikePostView(APIView):
 class UnlikePostView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id=pk)
         user = request.user
 
         # Check if the user has liked this post
@@ -148,8 +148,8 @@ class UnlikePostView(APIView):
 class AddCommentView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
+    def post(self, request, pk):
+        post = get_object_or_404(Post, id=pk)
         user = request.user
         content = request.data.get("content")
 
