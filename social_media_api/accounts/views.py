@@ -78,7 +78,7 @@ class UserProfileView(APIView):
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
         })
 
-class FollowUserView(APIView):
+class FollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
@@ -98,7 +98,7 @@ class FollowUserView(APIView):
         return Response({"error": "You are already following this user."}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UnfollowUserView(APIView):
+class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
