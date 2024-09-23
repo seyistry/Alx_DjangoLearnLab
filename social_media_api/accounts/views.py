@@ -1,4 +1,4 @@
-from rest_framework import status, generics
+from rest_framework import status, generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -79,16 +79,17 @@ class UserProfileView(APIView):
         })
 
 class FollowUserView(APIView):
-    permission_classes = [IsAuthenticated, IsSelfOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, username):
-        # Get the user to follow
-        user_to_follow = get_object_or_404(CustomUser, username=username)
+    def post(self, request, user_id):
+        # Fetch all users using CustomUser.objects.all() and get the user to follow
+        users = CustomUser.objects.all()
+        user_to_follow = get_object_or_404(users, id=user_id)
         
-        # Ensure the user is not trying to follow themselves
+        # Prevent following yourself
         if request.user == user_to_follow:
             return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Add the user to the following list if not already followed
         if user_to_follow not in request.user.following.all():
             request.user.following.add(user_to_follow)
@@ -96,12 +97,14 @@ class FollowUserView(APIView):
         
         return Response({"error": "You are already following this user."}, status=status.HTTP_400_BAD_REQUEST)
 
-class UnfollowUserView(APIView):
-    permission_classes = [IsAuthenticated, IsSelfOrReadOnly]
 
-    def post(self, request, username):
-        # Get the user to unfollow
-        user_to_unfollow = get_object_or_404(CustomUser, username=username)
+class UnfollowUserView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id):
+        # Fetch all users using CustomUser.objects.all() and get the user to unfollow
+        users = CustomUser.objects.all()
+        user_to_unfollow = get_object_or_404(users, id=user_id)
 
         # Check if the current user is following this user
         if user_to_unfollow in request.user.following.all():
