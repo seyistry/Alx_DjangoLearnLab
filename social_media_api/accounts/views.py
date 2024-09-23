@@ -6,8 +6,10 @@ from .serializers import UserRegistrationSerializer, UserLoginSerializer
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from .models import CustomUser
+from .permissions import IsSelfOrReadOnly 
 
-User = get_user_model()
 
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -75,3 +77,35 @@ class UserProfileView(APIView):
             'bio': user.bio,
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
         })
+
+class FollowUserView(APIView):
+    permission_classes = [IsAuthenticated, IsSelfOrReadOnly]
+
+    def post(self, request, username):
+        # Get the user to follow
+        user_to_follow = get_object_or_404(CustomUser, username=username)
+        
+        # Ensure the user is not trying to follow themselves
+        if request.user == user_to_follow:
+            return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Add the user to the following list if not already followed
+        if user_to_follow not in request.user.following.all():
+            request.user.following.add(user_to_follow)
+            return Response({"success": f"You are now following {user_to_follow.username}"}, status=status.HTTP_200_OK)
+        
+        return Response({"error": "You are already following this user."}, status=status.HTTP_400_BAD_REQUEST)
+
+class UnfollowUserView(APIView):
+    permission_classes = [IsAuthenticated, IsSelfOrReadOnly]
+
+    def post(self, request, username):
+        # Get the user to unfollow
+        user_to_unfollow = get_object_or_404(CustomUser, username=username)
+
+        # Check if the current user is following this user
+        if user_to_unfollow in request.user.following.all():
+            request.user.following.remove(user_to_unfollow)
+            return Response({"success": f"You have unfollowed {user_to_unfollow.username}"}, status=status.HTTP_200_OK)
+        
+        return Response({"error": "You are not following this user."}, status=status.HTTP_400_BAD_REQUEST)

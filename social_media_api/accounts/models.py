@@ -11,7 +11,12 @@ class CustomUser(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     
     # ManyToMany field to represent followers (symmetrical=False for directed relationship)
-    followers = models.ManyToManyField('self', symmetrical=False, related_name='following', blank=True)
+    followers = models.ManyToManyField(
+        'self',  # Reference to the same model
+        symmetrical=False,  # This ensures the relationship is not reciprocal
+        related_name='following',  # To access users this user is following
+        blank=True
+    )
 
     def __str__(self):
         return self.username
