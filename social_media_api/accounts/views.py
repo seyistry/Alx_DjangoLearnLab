@@ -9,6 +9,8 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from .models import CustomUser
 from .permissions import IsSelfOrReadOnly 
+from django.contrib.contenttypes.models import ContentType
+from notifications.models import Notification
 
 
 
@@ -78,25 +80,32 @@ class UserProfileView(APIView):
             'profile_picture': user.profile_picture.url if user.profile_picture else None,
         })
 
-class FollowUserView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+class FollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, user_id):
-        # Fetch all users using CustomUser.objects.all() and get the user to follow
-        users = CustomUser.objects.all()
-        user_to_follow = get_object_or_404(users, id=user_id)
-        
-        # Prevent following yourself
-        if request.user == user_to_follow:
+        target_user = get_object_or_404(CustomUser, id=user_id)
+        user = request.user
+
+        if user == target_user:
             return Response({"error": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Add the user to the following list if not already followed
-        if user_to_follow not in request.user.following.all():
-            request.user.following.add(user_to_follow)
-            return Response({"success": f"You are now following {user_to_follow.username}"}, status=status.HTTP_200_OK)
-        
-        return Response({"error": "You are already following this user."}, status=status.HTTP_400_BAD_REQUEST)
+        if target_user.followers.filter(id=user.id).exists():
+            return Response({"error": "You are already following this user."}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Add follower relationship
+        target_user.followers.add(user)
+
+        # Create a notification for the target user
+        Notification.objects.create(
+            recipient=target_user,
+            actor=user,
+            verb="followed",
+            target_content_type=ContentType.objects.get_for_model(user),
+            target_object_id=user.id
+        )
+
+        return Response({"success": f"You are now following {target_user.username}."}, status=status.HTTP_200_OK)
 
 class UnfollowUserView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
