@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from rest_framework.exceptions import PermissionDenied
-from rest_framework import viewsets, permissions, serializers
-from rest_framework import status
+from rest_framework import viewsets, permissions, serializers, status, generics
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -103,6 +102,8 @@ class FeedView(APIView):
 
 class LikePostView(APIView):
     permission_classes = [IsAuthenticated]
+
+    # posts/views.py doesn't contain: ["generics.get_object_or_404(Post, pk=pk)", "Like.objects.get_or_create(user=request.user, post=post)"]
 
     def post(self, request, post_id):
         post = get_object_or_404(Post, id=post_id)
